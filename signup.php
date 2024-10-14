@@ -1,7 +1,8 @@
 <?php
 $user_IsPresent = false;
+$signup_Error = false;
 include("db.php");
-if (isset($_POST['username']) && isset($_POST['email']) && isset($_POST['password'])) {
+if (isset($_POST['username']) && isset($_POST['email']) && isset($_POST['password']) && $CONN != NULL) {
     $USERNAME = htmlspecialchars($_POST['username']);
     $EMAIL = htmlspecialchars($_POST['email']);
     $PASSWORD = htmlspecialchars($_POST['password']);
@@ -14,8 +15,12 @@ if (isset($_POST['username']) && isset($_POST['email']) && isset($_POST['passwor
             setcookie("USER", $USERNAME, time() + (60 * 60 * 24 * 30), "/");
             header("Location: /");
             exit;
+        } else {
+            $signup_Error = true;
         }
     }
+} else if ($CONN == NULL) {
+    $signup_Error = true;
 }
 ?>
 <!DOCTYPE html>
@@ -53,7 +58,11 @@ if (isset($_POST['username']) && isset($_POST['email']) && isset($_POST['passwor
                 }
                 ?>
             </form>
-            <div id="signup-error" class="error hidden">Signup failed. Please try again.</div>
+            <?php
+            if ($signup_Error) {
+                echo '<div id="signup-error" class="error">Internal Error. Please try later.</div>';
+            }
+            ?>
             <div class="link-container">
                 <p>Already have an account? <a href="login.php">Login here</a>.</p>
             </div>
@@ -64,7 +73,3 @@ if (isset($_POST['username']) && isset($_POST['email']) && isset($_POST['passwor
 </body>
 
 </html>
-
-<?php
-// if()
-?>

@@ -1,11 +1,12 @@
 <?php
 $user_NotFound = false;
 $credentials_IsIncorrect = false;
+$login_Error = false;
+include("db.php");
 if (isset($_COOKIE['USER'])) {
     header('Location: /');
     exit();
-} else if (isset($_POST['username']) && isset($_POST['password'])) {
-    include("db.php");
+} else if (isset($_POST['username']) && isset($_POST['password']) && $CONN != NULL) {
     $USERNAME = htmlspecialchars($_POST['username']);
     $PASSWORD = htmlspecialchars($_POST['password']);
     $sql = "SELECT * FROM `credentials` WHERE `username`='$USERNAME';";
@@ -22,6 +23,8 @@ if (isset($_COOKIE['USER'])) {
     } else {
         $user_NotFound = true;
     }
+} else if ($CONN == NULL) {
+    $login_Error = true;
 }
 ?>
 
@@ -54,13 +57,17 @@ if (isset($_COOKIE['USER'])) {
                 if ($user_NotFound) {
                     echo "User not found...";
                 } else if ($credentials_IsIncorrect) {
-                    echo "Incorrect Username or Password...";
+                    echo "<p class='error'> Incorrect Username or Password...</p>";
                 }
                 ?>
             </form>
-            <div id="login-error" class="error hidden">Invalid credentials. Please try again.</div>
+            <?php
+            if ($login_Error) {
+                echo '<div id="login-error" class="error">Internal Error. Please try later.</div>';
+            }
+            ?>
             <div class="link-container">
-                <p>Don’t have an account? <a href="signup.php">Sign up here</a>.</p>
+                <p>Don't have an account? <a href="signup.php">Sign up here</a>.</p>
             </div>
         </div>
     </div>
